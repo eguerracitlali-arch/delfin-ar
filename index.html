@@ -8,42 +8,54 @@
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
   <style>
+    /* Zona flotante inferior de interacción */
     .btn-container {
       position: absolute;
       bottom: 25px;
       left: 0;
       width: 100%;
-      text-align: center;
+      display: flex;
+      justify-content: center;
+      gap: 12px;
       z-index: 999999 !important;
       pointer-events: auto;
+      padding: 0 15px;
+      box-sizing: border-box;
     }
 
-    #btn-girar {
+    .btn-ui {
       background: #ec4899;
       color: #ffffff;
       border: 3px solid #ffffff;
-      padding: 14px 28px;
-      font-size: 16px;
+      padding: 14px 16px;
+      font-size: 15px;
       font-weight: bold;
       border-radius: 30px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.4);
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       cursor: pointer;
       outline: none;
       user-select: none;
       -webkit-tap-highlight-color: transparent;
+      flex: 1;
+      max-width: 180px;
     }
 
-    #btn-girar:active {
-      transform: scale(0.94);
-      background: #be185d;
+    #btn-color {
+      background: #a855f7;
+    }
+
+    .btn-ui:active {
+      transform: scale(0.92);
+      opacity: 0.9;
     }
   </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- BOTÓN FLOTANTE EN PANTALLA -->
+  <!-- BOTONES DIRECTOS DE INTERACCIÓN EN PANTALLA -->
   <div class="btn-container">
-    <button id="btn-girar">🔄 GIRAR / AGRANDAR</button>
+    <button id="btn-color" class="btn-ui">🎨 CAMBIAR COLOR</button>
+    <button id="btn-girar" class="btn-ui">🔄 GIRAR / AGRANDAR</button>
   </div>
 
   <a-scene embedded 
@@ -105,19 +117,20 @@
 
   </a-scene>
 
-  <!-- RAYCASTER NATIVO THREE.JS DEDICADO PARA DETECTAR TOQUES EN EL ROBOT -->
+  <!-- LÓGICA DE INTERACCIÓN EN JAVASCRIPT -->
   <script>
     window.addEventListener('DOMContentLoaded', function () {
-      var sceneEl = document.querySelector('a-scene');
       var robot = document.querySelector('#robot');
       var cabeza = document.querySelector('#cabeza');
       var cuerpo = document.querySelector('#cuerpo');
+      var btnColor = document.querySelector('#btn-color');
       var btnGirar = document.querySelector('#btn-girar');
 
       var animando = false;
 
+      // Paletas cromáticas para alternar al presionar
       var paletas = [
-        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Verde Menta y Azul
+        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
         { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
         { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Turquesa y Morado
         { cabeza: '#f43f5e', cuerpo: '#14b8a6' }, // Fucsia y Esmeralda
@@ -125,49 +138,19 @@
       ];
       var indiceColor = 0;
 
-      // Esperar a que la escena 3D esté completamente cargada
-      sceneEl.addEventListener('loaded', function () {
-        var raycaster = new THREE.Raycaster();
-        var mouse = new THREE.Vector2();
-
-        function intentarCambiarColor(clientX, clientY) {
-          var camera = sceneEl.camera;
-          if (!camera) return;
-
-          // Convertir coordenadas táctiles a coordenadas normalizadas (-1 a +1)
-          mouse.x = (clientX / window.innerWidth) * 2 - 1;
-          mouse.y = -(clientY / window.innerHeight) * 2 + 1;
-
-          raycaster.setFromCamera(mouse, camera);
-
-          // Verificar colisión directa con los objetos 3D del robot
-          var intersects = raycaster.intersectObjects(robot.object3D.children, true);
-
-          if (intersects.length > 0) {
-            indiceColor = (indiceColor + 1) % paletas.length;
-            cabeza.setAttribute('material', 'color', paletas[indiceColor].cabeza);
-            cuerpo.setAttribute('material', 'color', paletas[indiceColor].cuerpo);
-          }
+      // 1. CAMBIO DE COLOR (Activado por botón o toque en pantalla)
+      function ejecutarCambioColor(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
         }
+        indiceColor = (indiceColor + 1) % paletas.length;
+        cabeza.setAttribute('material', 'color', paletas[indiceColor].cabeza);
+        cuerpo.setAttribute('material', 'color', paletas[indiceColor].cuerpo);
+      }
 
-        // Capturar toque táctil en móviles
-        window.addEventListener('touchend', function (e) {
-          if (e.target === btnGirar || btnGirar.contains(e.target)) return;
-          if (e.changedTouches && e.changedTouches.length > 0) {
-            var touch = e.changedTouches[0];
-            intentarCambiarColor(touch.clientX, touch.clientY);
-          }
-        });
-
-        // Capturar click en computadoras
-        window.addEventListener('click', function (e) {
-          if (e.target === btnGirar || btnGirar.contains(e.target)) return;
-          intentarCambiarColor(e.clientX, e.clientY);
-        });
-      });
-
-      // 2. FUNCIÓN DEL BOTÓN EN PANTALLA: GIRAR Y AGRANDAR
-      function girarYAgrandar(e) {
+      // 2. GIRO Y AGRANDAR DE TAMAÑO
+      function ejecutarGiroYAgrandar(e) {
         if (e) {
           e.preventDefault();
           e.stopPropagation();
@@ -200,8 +183,18 @@
         }, 1000);
       }
 
-      btnGirar.addEventListener('click', girarYAgrandar);
-      btnGirar.addEventListener('touchstart', girarYAgrandar);
+      // Conectar eventos a los botones
+      btnColor.addEventListener('click', ejecutarCambioColor);
+      btnColor.addEventListener('touchstart', ejecutarCambioColor);
+
+      btnGirar.addEventListener('click', ejecutarGiroYAgrandar);
+      btnGirar.addEventListener('touchstart', ejecutarGiroYAgrandar);
+
+      // También permite tocar cualquier parte superior de la pantalla para cambiar el color
+      window.addEventListener('touchend', function (e) {
+        if (e.target === btnGirar || btnGirar.contains(e.target) || e.target === btnColor || btnColor.contains(e.target)) return;
+        ejecutarCambioColor(e);
+      });
     });
   </script>
 
