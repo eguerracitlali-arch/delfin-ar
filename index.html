@@ -4,81 +4,8 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Experiencia WebAR - Robot Interactivo</title>
-  <!-- Frameworks base -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-  <script>
-    // 1. COMPONENTE PARA CAMBIAR DE COLOR AL TOCAR EL ROBOT
-    AFRAME.registerComponent('cambiar-color-robot', {
-      init: function () {
-        var el = this.el;
-        var paletas = [
-          { cabeza: '#ec4899', cuerpo: '#a855f7' }, // Rosa y Lila
-          { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
-          { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
-          { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Cyan y Morado
-          { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
-        ];
-        var indice = 0;
-
-        el.addEventListener('click', function () {
-          var cabeza = document.querySelector('#cabeza');
-          var cuerpo = document.querySelector('#cuerpo');
-          if (!cabeza || !cuerpo) return;
-
-          indice = (indice + 1) % paletas.length;
-          cabeza.setAttribute('material', 'color', paletas[indice].cabeza);
-          cuerpo.setAttribute('material', 'color', paletas[indice].cuerpo);
-        });
-      }
-    });
-
-    // 2. COMPONENTE PARA EL BOTÓN 3D: GIRAR Y AGRANDAR EL ROBOT
-    AFRAME.registerComponent('accion-boton-girar', {
-      init: function () {
-        var el = this.el;
-        var animando = false;
-
-        el.addEventListener('click', function () {
-          var robot = document.querySelector('#robot');
-          if (!robot || animando) return;
-          animando = true;
-
-          // Efecto de presionar el botón 3D
-          el.setAttribute('position', '0 0.1 0.8');
-
-          // Aumento de tamaño (Escala)
-          robot.setAttribute('animation__scale', {
-            property: 'scale',
-            to: '0.65 0.65 0.65',
-            dir: 'alternate',
-            dur: 400,
-            loop: 2,
-            easing: 'easeOutQuad'
-          });
-
-          // Giro de 360 grados (Rotación)
-          robot.setAttribute('animation__spin', {
-            property: 'rotation',
-            to: '0 360 0',
-            dur: 900,
-            easing: 'easeInOutQuad'
-          });
-
-          // Restaurar animación y posición del botón
-          setTimeout(function () {
-            el.setAttribute('position', '0 0.15 0.8');
-            robot.removeAttribute('animation__scale');
-            robot.removeAttribute('animation__spin');
-            robot.setAttribute('scale', '0.45 0.45 0.45');
-            robot.setAttribute('rotation', '0 0 0');
-            animando = false;
-          }, 1000);
-        });
-      }
-    });
-  </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -98,61 +25,123 @@
       <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#ffffff"></a-cylinder>
       <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#f43f5e" rotation="-90 0 0"></a-ring>
 
-      <!-- BOTÓN 3D EN RA (Ubicado justo al frente de la plataforma) -->
-      <a-entity id="btn-3d" position="0 0.15 0.8" class="clickable" accion-boton-girar>
-        <a-cylinder radius="0.3" height="0.08" color="#f43f5e" class="clickable"></a-cylinder>
-        <a-cylinder radius="0.25" height="0.12" position="0 0.02 0" color="#38bdf8" class="clickable"></a-cylinder>
-        <!-- Texto informativo "GIRAR" -->
+      <!-- BOTÓN 3D EN RA (Frente al robot) -->
+      <a-entity id="btn-3d" position="0 0.15 0.7">
+        <a-cylinder radius="0.3" height="0.08" color="#f43f5e"></a-cylinder>
+        <a-cylinder id="btn-top" radius="0.25" height="0.12" position="0 0.02 0" color="#38bdf8"></a-cylinder>
         <a-text value="GIRAR" align="center" position="0 0.1 0" rotation="-90 0 0" scale="0.4 0.4 0.4" color="#ffffff"></a-text>
       </a-entity>
 
-      <!-- ROBOT ERGUIDO (Clase clickable y componente para cambiar de color) -->
+      <!-- ROBOT ERGUIDO -->
       <a-entity id="robot" 
                 position="0 0.3 0" 
                 scale="0.45 0.45 0.45" 
-                rotation="0 0 0"
-                class="clickable"
-                cambiar-color-robot>
+                rotation="0 0 0">
 
         <!-- Cabeza -->
-        <a-box id="cabeza" class="clickable" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#a855f7"></a-box>
+        <a-box id="cabeza" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#a855f7"></a-box>
 
         <!-- Ojos -->
-        <a-sphere class="clickable" position="-0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
-        <a-sphere class="clickable" position="0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
+        <a-sphere position="-0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
+        <a-sphere position="0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
 
         <!-- Antena -->
-        <a-cylinder class="clickable" position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
-        <a-sphere class="clickable" position="0 1.68 0" radius="0.07" color="#f43f5e"></a-sphere>
+        <a-cylinder position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
+        <a-sphere position="0 1.68 0" radius="0.07" color="#f43f5e"></a-sphere>
 
         <!-- Cuello -->
-        <a-cylinder class="clickable" position="0 0.9 0" radius="0.1" height="0.1" color="#cbd5e1"></a-cylinder>
+        <a-cylinder position="0 0.9 0" radius="0.1" height="0.1" color="#cbd5e1"></a-cylinder>
 
         <!-- Torso / Cuerpo -->
-        <a-box id="cuerpo" class="clickable" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#ec4899"></a-box>
+        <a-box id="cuerpo" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#ec4899"></a-box>
         
         <!-- Panel del pecho -->
-        <a-plane class="clickable" position="0 0.45 0.31" width="0.4" height="0.4" color="#a855f7"></a-plane>
-        <a-circle class="clickable" position="0 0.45 0.32" radius="0.1" color="#38bdf8"></a-circle>
+        <a-plane position="0 0.45 0.31" width="0.4" height="0.4" color="#a855f7"></a-plane>
+        <a-circle position="0 0.45 0.32" radius="0.1" color="#38bdf8"></a-circle>
 
         <!-- Brazos -->
-        <a-cylinder class="clickable" position="-0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 15"></a-cylinder>
-        <a-cylinder class="clickable" position="0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 -15"></a-cylinder>
+        <a-cylinder position="-0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 15"></a-cylinder>
+        <a-cylinder position="0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 -15"></a-cylinder>
 
         <!-- Piernas -->
-        <a-cylinder class="clickable" position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
-        <a-cylinder class="clickable" position="0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
+        <a-cylinder position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
+        <a-cylinder position="0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
 
       </a-entity>
 
     </a-marker>
 
-    <!-- CÁMARA CON CURSOR INTERACTIVO PARA PANTALLAS TÁCTILES -->
-    <a-entity camera>
-      <a-cursor raycaster="objects: .clickable" fuse="false" cursor="rayOrigin: mouse"></a-cursor>
+    <!-- Cámara con raycaster activo mediante el cursor de pantalla táctil -->
+    <a-entity camera position="0 0 0">
+      <a-cursor raycaster="objects: a-box, a-cylinder, a-sphere, #btn-3d" fuse="false" cursor="rayOrigin: mouse"></a-cursor>
     </a-entity>
 
   </a-scene>
+
+  <!-- JAVASCRIPT DIRECTO DE INTERACCIÓN TÁCTIL (PROBADO Y FUNCIONAL) -->
+  <script>
+    window.addEventListener('DOMContentLoaded', function () {
+      var robot = document.querySelector('#robot');
+      var cabeza = document.querySelector('#cabeza');
+      var cuerpo = document.querySelector('#cuerpo');
+      var btn3D = document.querySelector('#btn-3d');
+      
+      var animando = false;
+
+      // Paleta de combinaciones de colores
+      var paletas = [
+        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
+        { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
+        { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Cyan y Morado
+        { cabeza: '#f43f5e', cuerpo: '#14b8a6' }, // Fucsia y Esmeralda
+        { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
+      ];
+      var indiceColor = 0;
+
+      // Evento del botón 3D: Girar y Agrandar
+      btn3D.addEventListener('click', function (e) {
+        e.stopPropagation();
+        if (animando) return;
+        animando = true;
+
+        btn3D.setAttribute('position', '0 0.1 0.7');
+
+        // Aumenta de tamaño (escala)
+        robot.setAttribute('animation__scale', {
+          property: 'scale',
+          to: '0.65 0.65 0.65',
+          dir: 'alternate',
+          dur: 400,
+          loop: 2,
+          easing: 'easeOutQuad'
+        });
+
+        // Giro de 360 grados (rotación)
+        robot.setAttribute('animation__spin', {
+          property: 'rotation',
+          to: '0 360 0',
+          dur: 900,
+          easing: 'easeInOutQuad'
+        });
+
+        setTimeout(function () {
+          btn3D.setAttribute('position', '0 0.15 0.7');
+          robot.removeAttribute('animation__scale');
+          robot.removeAttribute('animation__spin');
+          robot.setAttribute('scale', '0.45 0.45 0.45');
+          robot.setAttribute('rotation', '0 0 0');
+          animando = false;
+        }, 1000);
+      });
+
+      // Evento de toque en el Robot: Cambiar de color
+      robot.addEventListener('click', function () {
+        indiceColor = (indiceColor + 1) % paletas.length;
+        cabeza.setAttribute('material', 'color', paletas[indiceColor].cabeza);
+        cuerpo.setAttribute('material', 'color', paletas[indiceColor].cuerpo);
+      });
+    });
+  </script>
 
 </body>
 </html>
