@@ -6,64 +6,15 @@
   <title>Experiencia WebAR - Robot Interactivo</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-
-  <style>
-    /* Zona flotante inferior de interacción */
-    .btn-container {
-      position: absolute;
-      bottom: 25px;
-      left: 0;
-      width: 100%;
-      display: flex;
-      justify-content: center;
-      gap: 12px;
-      z-index: 999999 !important;
-      pointer-events: auto;
-      padding: 0 15px;
-      box-sizing: border-box;
-    }
-
-    .btn-ui {
-      background: #ec4899;
-      color: #ffffff;
-      border: 3px solid #ffffff;
-      padding: 14px 16px;
-      font-size: 15px;
-      font-weight: bold;
-      border-radius: 30px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
-      cursor: pointer;
-      outline: none;
-      user-select: none;
-      -webkit-tap-highlight-color: transparent;
-      flex: 1;
-      max-width: 180px;
-    }
-
-    #btn-color {
-      background: #a855f7;
-    }
-
-    .btn-ui:active {
-      transform: scale(0.92);
-      opacity: 0.9;
-    }
-  </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
-
-  <!-- BOTONES DIRECTOS DE INTERACCIÓN EN PANTALLA -->
-  <div class="btn-container">
-    <button id="btn-color" class="btn-ui">🎨 CAMBIAR COLOR</button>
-    <button id="btn-girar" class="btn-ui">🔄 GIRAR / AGRANDAR</button>
-  </div>
 
   <a-scene embedded 
            arjs="sourceType: webcam; debugUIEnabled: false;" 
            vr-mode-ui="enabled: false"
            renderer="logarithmicDepthBuffer: true;">
 
-    <!-- Iluminación -->
+    <!-- Iluminación de la escena -->
     <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
     <a-light type="directional" color="#ffffff" intensity="0.6" position="-1 4 2"></a-light>
 
@@ -117,20 +68,18 @@
 
   </a-scene>
 
-  <!-- LÓGICA DE INTERACCIÓN EN JAVASCRIPT -->
+  <!-- JAVASCRIPT: INTERACCIÓN PURA AL TOCAR EL ROBOT -->
   <script>
     window.addEventListener('DOMContentLoaded', function () {
       var robot = document.querySelector('#robot');
       var cabeza = document.querySelector('#cabeza');
       var cuerpo = document.querySelector('#cuerpo');
-      var btnColor = document.querySelector('#btn-color');
-      var btnGirar = document.querySelector('#btn-girar');
 
       var animando = false;
 
-      // Paletas cromáticas para alternar al presionar
+      // Paletas de colores pastel/vivos
       var paletas = [
-        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
+        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Verde Menta y Azul
         { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
         { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Turquesa y Morado
         { cabeza: '#f43f5e', cuerpo: '#14b8a6' }, // Fucsia y Esmeralda
@@ -138,63 +87,50 @@
       ];
       var indiceColor = 0;
 
-      // 1. CAMBIO DE COLOR (Activado por botón o toque en pantalla)
-      function ejecutarCambioColor(e) {
+      // Función de interacción ejecutada al tocar la pantalla
+      function interactuarRobot(e) {
         if (e) {
           e.preventDefault();
-          e.stopPropagation();
         }
+
+        // 1. Cambio de Color inmediato
         indiceColor = (indiceColor + 1) % paletas.length;
         cabeza.setAttribute('material', 'color', paletas[indiceColor].cabeza);
         cuerpo.setAttribute('material', 'color', paletas[indiceColor].cuerpo);
-      }
 
-      // 2. GIRO Y AGRANDAR DE TAMAÑO
-      function ejecutarGiroYAgrandar(e) {
-        if (e) {
-          e.preventDefault();
-          e.stopPropagation();
+        // 2. Animación complementaria de giro y escala si no está animando
+        if (!animando) {
+          animando = true;
+
+          robot.setAttribute('animation__scale', {
+            property: 'scale',
+            to: '0.6 0.6 0.6',
+            dir: 'alternate',
+            dur: 300,
+            loop: 2,
+            easing: 'easeOutQuad'
+          });
+
+          robot.setAttribute('animation__spin', {
+            property: 'rotation',
+            to: '0 360 0',
+            dur: 800,
+            easing: 'easeInOutQuad'
+          });
+
+          setTimeout(function () {
+            robot.removeAttribute('animation__scale');
+            robot.removeAttribute('animation__spin');
+            robot.setAttribute('scale', '0.45 0.45 0.45');
+            robot.setAttribute('rotation', '0 0 0');
+            animando = false;
+          }, 900);
         }
-        if (animando) return;
-        animando = true;
-
-        robot.setAttribute('animation__scale', {
-          property: 'scale',
-          to: '0.65 0.65 0.65',
-          dir: 'alternate',
-          dur: 400,
-          loop: 2,
-          easing: 'easeOutQuad'
-        });
-
-        robot.setAttribute('animation__spin', {
-          property: 'rotation',
-          to: '0 360 0',
-          dur: 900,
-          easing: 'easeInOutQuad'
-        });
-
-        setTimeout(function () {
-          robot.removeAttribute('animation__scale');
-          robot.removeAttribute('animation__spin');
-          robot.setAttribute('scale', '0.45 0.45 0.45');
-          robot.setAttribute('rotation', '0 0 0');
-          animando = false;
-        }, 1000);
       }
 
-      // Conectar eventos a los botones
-      btnColor.addEventListener('click', ejecutarCambioColor);
-      btnColor.addEventListener('touchstart', ejecutarCambioColor);
-
-      btnGirar.addEventListener('click', ejecutarGiroYAgrandar);
-      btnGirar.addEventListener('touchstart', ejecutarGiroYAgrandar);
-
-      // También permite tocar cualquier parte superior de la pantalla para cambiar el color
-      window.addEventListener('touchend', function (e) {
-        if (e.target === btnGirar || btnGirar.contains(e.target) || e.target === btnColor || btnColor.contains(e.target)) return;
-        ejecutarCambioColor(e);
-      });
+      // Escuchar eventos táctiles sobre la pantalla
+      window.addEventListener('touchend', interactuarRobot);
+      window.addEventListener('click', interactuarRobot);
     });
   </script>
 
