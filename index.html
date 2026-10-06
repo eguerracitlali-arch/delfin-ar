@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Delfin en Realidad Aumentada</title>
+    <!-- 1. Cargamos las librerías necesarias de A-Frame y AR.js -->
+    <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+    <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+    
+    <!-- Script personalizado para detectar los toques de los usuarios -->
+    <script>
+      AFRAME.registerComponent('interactivo', {
+        init: function () {
+          let el = this.el;
+          let saltando = false;
+          let escalaGrande = false;
+          let rotacion = 0;
+
+          el.addEventListener('click', function () {
+            // Animación 1: Rotación (giro continuo de 45 grados en cada toque)
+            rotacion += 45;
+            el.setAttribute('rotation', `0 ${rotacion} 0`);
+
+            // Animación 2: Escala (Alterna entre grande y chico)
+            if (!escalaGrande) {
+              el.setAttribute('scale', '1.3 1.3 1.3');
+              escalaGrande = true;
+            } else {
+              el.setAttribute('scale', '1 1 1');
+              escalaGrande = false;
+            }
+
+            // Animación 3: Salto (Sube y baja en el eje Y)
+            if (!saltando) {
+              saltando = true;
+              el.setAttribute('position', '0 0.8 0'); // Brinca
+              
+              setTimeout(() => {
+                el.setAttribute('position', '0 0.2 0'); // Cae de nuevo al agua
+                saltando = false;
+              }, 400);
+            }
+          });
+        }
+      });
+    </script>
+  </head>
+  <body style="margin: 0; overflow: hidden;">
+    
+    <!-- 2. Inicializamos la escena de Realidad Aumentada con cámara activa -->
+    <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" cursor="rayOrigin: mouse">
+      
+      <!-- Marcador "Hiro" (el mismo de tu cuaderno) -->
+      <a-marker preset="hiro">
+        
+        <!-- 3. Piso/Océano: Una superficie azul con ondas para dar efecto de agua -->
+        <a-ellipse position="0 0 0" rotation="-90 0 0" radius-x="1.2" radius-y="1.2" color="#0077be" opacity="0.7">
+          <!-- Ondas decorativas en el agua -->
+          <a-ring color="#e0f7fa" radius-inner="0.3" radius-outer="0.33" position="0 0 0.01"></a-ring>
+          <a-ring color="#e0f7fa" radius-inner="0.7" radius-outer="0.73" position="0 0 0.01"></a-ring>
+        </a-ellipse>
+
+        <!-- 4. El Delfín (Hecho de figuras básicas para asegurar que cargue) -->
+        <!-- Tiene la clase "clickable" e "interactivo" para poder presionarlo en el cel -->
+        <a-entity id="delfin" position="0 0.2 0" scale="1 1 1" class="clickable" interactivo>
+          <!-- Cuerpo del Delfín -->
+          <a-ellipse color="#4A90E2" radius-x="0.6" radius-y="0.22" position="0 0.2 0" rotation="0 0 -15"></a-ellipse>
+          <!-- Nariz / Hocico -->
+          <a-cone color="#4A90E2" radius-bottom="0.06" height="0.25" position="0.55 0.1 0" rotation="0 0 -75"></a-cone>
+          <!-- Aleta Dorsal (Arriba) -->
+          <a-cone color="#357ABD" radius-bottom="0.07" height="0.2" position="-0.15 0.4 0" rotation="0 0 -30"></a-cone>
+          <!-- Cola -->
+          <a-cone color="#357ABD" radius-bottom="0.08" height="0.3" position="-0.5 0.05 0" rotation="0 0 45"></a-cone>
+          <!-- Aleta de la cola (Fin) -->
+          <a-box color="#4A90E2" width="0.15" height="0.03" depth="0.4" position="-0.7 -0.1 0" rotation="15 0 0"></a-box>
+          <!-- Ojo izquierdo -->
+          <a-sphere color="#000" radius="0.025" position="0.35 0.23 0.1"></a-sphere>
+          <!-- Ojo derecho -->
+          <a-sphere color="#000" radius="0.025" position="0.35 0.23 -0.1"></a-sphere>
+        </a-entity>
+
+      </a-marker>
+
+      <!-- 5. Cámara de RA necesaria para captar el marcador y los clics -->
+      <a-entity camera>
+        <a-cursor raycaster="objects: .clickable"></a-cursor>
+      </a-entity>
+
+    </a-scene>
+  </body>
+</html>
