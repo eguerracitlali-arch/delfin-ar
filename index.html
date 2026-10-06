@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Experiencia WebAR - Robot Pastel</title>
+  <title>Experiencia WebAR - Robot Interactivo</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
@@ -14,65 +14,66 @@
            vr-mode-ui="enabled: false"
            renderer="logarithmicDepthBuffer: true;">
 
-    <!-- Iluminación clara y suave -->
-    <a-light type="ambient" color="#ffffff" intensity="0.95"></a-light>
-    <a-light type="directional" color="#fce7f3" intensity="0.5" position="-1 4 2"></a-light>
+    <!-- Iluminación -->
+    <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
+    <a-light type="directional" color="#ffffff" intensity="0.6" position="-1 4 2"></a-light>
 
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
 
-      <!-- PISO / REFERENCIA VISUAL (Base gris muy claro con aro rosa pastel suave) -->
-      <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#f1f5f9"></a-cylinder>
-      <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#fbcfe8" rotation="-90 0 0"></a-ring>
+      <!-- PISO / REFERENCIA VISUAL (Plataforma blanca con borde fucsia pastel) -->
+      <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#ffffff"></a-cylinder>
+      <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#f43f5e" rotation="-90 0 0"></a-ring>
 
-      <!-- ROBOT DE PIE (Tonos pasteles claros: Lila suave, Rosa claro, Blanco) -->
+      <!-- ROBOT (Colores definidos: Lila, Rosa y Celeste) -->
       <a-entity id="robot" 
+                class="clickable"
                 position="0 0.1 0" 
                 scale="0.45 0.45 0.45" 
                 rotation="-90 0 0" 
                 interaccion-robot>
 
-        <!-- Cabeza (Lila pastel muy claro) -->
-        <a-box id="cabeza" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#e9d5ff"></a-box>
+        <!-- Cabeza (Lila vibrante) -->
+        <a-box id="cabeza" class="clickable" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#a855f7"></a-box>
 
-        <!-- Ojos (Blanco con destello muy suave) -->
-        <a-sphere position="-0.15 1.28 0.26" radius="0.08" color="#ffffff"></a-sphere>
-        <a-sphere position="0.15 1.28 0.26" radius="0.08" color="#ffffff"></a-sphere>
+        <!-- Ojos (Celeste brillante) -->
+        <a-sphere class="clickable" position="-0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
+        <a-sphere class="clickable" position="0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
 
-        <!-- Antena con esfera rosa pastel -->
-        <a-cylinder position="0 1.55 0" radius="0.02" height="0.2" color="#f5d0fe"></a-cylinder>
-        <a-sphere position="0 1.68 0" radius="0.07" color="#fbcfe8"></a-sphere>
+        <!-- Antena con luz fucsia -->
+        <a-cylinder class="clickable" position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
+        <a-sphere class="clickable" position="0 1.68 0" radius="0.07" color="#f43f5e"></a-sphere>
 
-        <!-- Cuello (Lila muy claro) -->
-        <a-cylinder position="0 0.9 0" radius="0.1" height="0.1" color="#f3e8ff"></a-cylinder>
+        <!-- Cuello -->
+        <a-cylinder class="clickable" position="0 0.9 0" radius="0.1" height="0.1" color="#cbd5e1"></a-cylinder>
 
-        <!-- Cuerpo / Torso (Rosa pastel muy suave) -->
-        <a-box id="cuerpo" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#fce7f3"></a-box>
+        <!-- Cuerpo / Torso (Rosa fucsia brillante) -->
+        <a-box id="cuerpo" class="clickable" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#ec4899"></a-box>
         
-        <!-- Panel del pecho en tono suave -->
-        <a-plane position="0 0.45 0.31" width="0.4" height="0.4" color="#f5d0fe"></a-plane>
-        <a-circle position="0 0.45 0.32" radius="0.1" color="#ffffff"></a-circle>
+        <!-- Panel del pecho -->
+        <a-plane class="clickable" position="0 0.45 0.31" width="0.4" height="0.4" color="#a855f7"></a-plane>
+        <a-circle class="clickable" position="0 0.45 0.32" radius="0.1" color="#38bdf8"></a-circle>
 
-        <!-- Brazos (Lila pastel suave) -->
-        <a-cylinder position="-0.52 0.5 0" radius="0.08" height="0.6" color="#e9d5ff" rotation="0 0 15"></a-cylinder>
-        <a-cylinder position="0.52 0.5 0" radius="0.08" height="0.6" color="#e9d5ff" rotation="0 0 -15"></a-cylinder>
+        <!-- Brazos (Lila) -->
+        <a-cylinder class="clickable" position="-0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 15"></a-cylinder>
+        <a-cylinder class="clickable" position="0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 -15"></a-cylinder>
 
-        <!-- Piernas (Lila suave) -->
-        <a-cylinder position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#ddd6fe"></a-cylinder>
-        <a-cylinder position="0.2 -0.1 0" radius="0.1" height="0.4" color="#ddd6fe"></a-cylinder>
+        <!-- Piernas (Azul/Gris oscuro para dar contraste) -->
+        <a-cylinder class="clickable" position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
+        <a-cylinder class="clickable" position="0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
 
       </a-entity>
 
     </a-marker>
 
-    <!-- Cámara -->
+    <!-- Cámara con raycaster amplio y soporte táctil -->
     <a-entity camera>
-      <a-cursor raycaster="objects: [interaccion-robot]" fuse="false"></a-cursor>
+      <a-cursor raycaster="objects: .clickable" fuse="false" cursor="rayOrigin: mouse"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- Script para la interacción táctil JS (+ RA) con colores pasteles claros -->
+  <!-- Script de Interacción Táctil JS + RA -->
   <script>
     AFRAME.registerComponent('interaccion-robot', {
       init: function () {
@@ -81,46 +82,56 @@
         var cuerpo = document.querySelector('#cuerpo');
         var animando = false;
 
-        // Paleta de tonos pasteles súper claros para los cambios al tocar
-        var colores = ['#fce7f3', '#e9d5ff', '#f5d0fe', '#ddd6fe', '#fae8ff', '#fbcfe8'];
-        var indiceColor = 0;
+        // Combinaciones de colores combinados para cabeza y cuerpo
+        var paletas = [
+          { cabeza: '#ec4899', cuerpo: '#a855f7' }, // Rosa y Lila
+          { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
+          { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
+          { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Cyan y Morado
+          { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
+        ];
+        var indice = 0;
 
-        el.addEventListener('click', function () {
+        function ejecutarAnimacion() {
           if (animando) return;
           animando = true;
 
-          // 1. Cambio de Color pastel suave
-          indiceColor = (indiceColor + 1) % colores.length;
-          var nuevoColor = colores[indiceColor];
-          cabeza.setAttribute('material', 'color', nuevoColor);
-          cuerpo.setAttribute('material', 'color', nuevoColor);
+          // 1. Cambio de Color en Vivo
+          indice = (indice + 1) % paletas.length;
+          cabeza.setAttribute('material', 'color', paletas[indice].cabeza);
+          cuerpo.setAttribute('material', 'color', paletas[indice].cuerpo);
 
-          // 2. Aumento de tamaño temporal
+          // 2. Cambio de Tamaño (Agranda a 0.65)
           el.setAttribute('animation__scale', {
             property: 'scale',
-            to: '0.6 0.6 0.6',
+            to: '0.65 0.65 0.65',
             dir: 'alternate',
-            dur: 300,
+            dur: 350,
             loop: 2,
             easing: 'easeOutQuad'
           });
 
-          // 3. Giro completo
+          // 3. Giro de 360 grados
           el.setAttribute('animation__spin', {
             property: 'rotation',
             to: '-90 360 0',
-            dur: 800,
+            dur: 900,
             easing: 'easeInOutQuad'
           });
 
+          // Restaurar animación
           setTimeout(function () {
             el.removeAttribute('animation__scale');
             el.removeAttribute('animation__spin');
             el.setAttribute('scale', '0.45 0.45 0.45');
             el.setAttribute('rotation', '-90 0 0');
             animando = false;
-          }, 900);
-        });
+          }, 1000);
+        }
+
+        // Eventos táctiles para móviles y clicks de mouse
+        el.addEventListener('click', ejecutarAnimacion);
+        el.addEventListener('touchstart', ejecutarAnimacion);
       }
     });
   </script>
