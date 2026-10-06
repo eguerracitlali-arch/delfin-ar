@@ -3,19 +3,19 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-  <title>Experiencia WebAR - Robot Interactivo v2</title>
+  <title>Experiencia WebAR - Robot Interactivo</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 
   <style>
-    /* Botón superpuesto en pantalla */
     .btn-container {
       position: absolute;
-      bottom: 20px;
+      bottom: 25px;
       left: 0;
       width: 100%;
       text-align: center;
       z-index: 999999 !important;
+      pointer-events: auto;
     }
     #btn-accion {
       background: #ec4899;
@@ -27,8 +27,46 @@
       border-radius: 30px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.5);
       cursor: pointer;
+      outline: none;
+      user-select: none;
+      -webkit-tap-highlight-color: transparent;
+    }
+    #btn-accion:active {
+      transform: scale(0.92);
+      background: #be185d;
     }
   </style>
+
+  <script>
+    // Componente oficial A-Frame para interacción táctil sobre el Robot
+    AFRAME.registerComponent('robot-interactivo', {
+      init: function () {
+        var el = this.el;
+        var cabeza = document.querySelector('#cabeza');
+        var cuerpo = document.querySelector('#cuerpo');
+
+        var paletas = [
+          { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Verde y Azul
+          { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Amarillo y Rojo
+          { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Turquesa y Morado
+          { cabeza: '#f43f5e', cuerpo: '#14b8a6' }, // Fucsia y Esmeralda
+          { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
+        ];
+        var indice = 0;
+
+        function cambiarColor(e) {
+          if (e) e.stopPropagation();
+          indice = (indice + 1) % paletas.length;
+          cabeza.setAttribute('material', 'color', paletas[indice].cabeza);
+          cuerpo.setAttribute('material', 'color', paletas[indice].cuerpo);
+        }
+
+        el.addEventListener('click', cambiarColor);
+        el.addEventListener('touchstart', cambiarColor);
+        el.addEventListener('mousedown', cambiarColor);
+      }
+    });
+  </script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
@@ -52,69 +90,100 @@
       <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#ffffff"></a-cylinder>
       <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#f43f5e" rotation="-90 0 0"></a-ring>
 
-      <!-- ROBOT ERGUIDO DE PIE -->
+      <!-- ROBOT ERGUIDO DE PIE (Con componente de interacción registrado) -->
       <a-entity id="robot" 
+                class="clickable"
                 position="0 0.3 0" 
                 scale="0.45 0.45 0.45" 
-                rotation="0 0 0">
+                rotation="0 0 0"
+                robot-interactivo>
 
         <!-- Cabeza -->
-        <a-box id="cabeza" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#a855f7"></a-box>
+        <a-box id="cabeza" class="clickable" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#a855f7"></a-box>
 
         <!-- Ojos -->
-        <a-sphere position="-0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
-        <a-sphere position="0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
+        <a-sphere class="clickable" position="-0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
+        <a-sphere class="clickable" position="0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
 
         <!-- Antena -->
-        <a-cylinder position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
-        <a-sphere position="0 1.68 0" radius="0.07" color="#f43f5e"></a-sphere>
+        <a-cylinder class="clickable" position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
+        <a-sphere class="clickable" position="0 1.68 0" radius="0.07" color="#f43f5e"></a-sphere>
 
         <!-- Cuello -->
-        <a-cylinder position="0 0.9 0" radius="0.1" height="0.1" color="#cbd5e1"></a-cylinder>
+        <a-cylinder class="clickable" position="0 0.9 0" radius="0.1" height="0.1" color="#cbd5e1"></a-cylinder>
 
         <!-- Torso / Cuerpo -->
-        <a-box id="cuerpo" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#ec4899"></a-box>
+        <a-box id="cuerpo" class="clickable" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#ec4899"></a-box>
         
         <!-- Panel del pecho -->
-        <a-plane position="0 0.45 0.31" width="0.4" height="0.4" color="#a855f7"></a-plane>
-        <a-circle position="0 0.45 0.32" radius="0.1" color="#38bdf8"></a-circle>
+        <a-plane class="clickable" position="0 0.45 0.31" width="0.4" height="0.4" color="#a855f7"></a-plane>
+        <a-circle class="clickable" position="0 0.45 0.32" radius="0.1" color="#38bdf8"></a-circle>
 
         <!-- Brazos -->
-        <a-cylinder position="-0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 15"></a-cylinder>
-        <a-cylinder position="0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 -15"></a-cylinder>
+        <a-cylinder class="clickable" position="-0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 15"></a-cylinder>
+        <a-cylinder class="clickable" position="0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 -15"></a-cylinder>
 
         <!-- Piernas -->
-        <a-cylinder position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
-        <a-cylinder position="0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
+        <a-cylinder class="clickable" position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
+        <a-cylinder class="clickable" position="0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
 
       </a-entity>
 
     </a-marker>
 
-    <a-entity camera></a-entity>
+    <!-- Cámara para interacciones táctiles -->
+    <a-entity camera>
+      <a-cursor raycaster="objects: .clickable" fuse="false" cursor="rayOrigin: mouse"></a-cursor>
+    </a-entity>
 
   </a-scene>
 
-  <!-- JAVASCRIPT GLOBAL -->
+  <!-- SCRIPT PARA EL BOTÓN EN PANTALLA -->
   <script>
-    document.addEventListener("DOMContentLoaded", function () {
-      var robot = document.querySelector("#robot");
-      var cabeza = document.querySelector("#cabeza");
-      var cuerpo = document.querySelector("#cuerpo");
-      var btn = document.querySelector("#btn-accion");
+    window.addEventListener('DOMContentLoaded', function () {
+      var btn = document.querySelector('#btn-accion');
+      var robot = document.querySelector('#robot');
       var animando = false;
 
-      var paletas = [
-        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Verde y Azul
-        { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Amarillo y Rojo
-        { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Turquesa y Morado
-        { cabeza: '#f43f5e', cuerpo: '#14b8a6' }, // Fucsia y Esmeralda
-        { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
-      ];
-      var indice = 0;
+      function girarYAgrandar(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        if (animando) return;
+        animando = true;
 
-      // 1. CAMBIO DE COLOR AL TOCAR LA CÁMARA/PANTALLA
-      document.body.addEventListener("click", function (e) {
-        if (e.target === btn) return; // Si toca el botón no cambia color
+        // Animación de tamaño
+        robot.setAttribute('animation__scale', {
+          property: 'scale',
+          to: '0.65 0.65 0.65',
+          dir: 'alternate',
+          dur: 400,
+          loop: 2,
+          easing: 'easeOutQuad'
+        });
 
-        indice = (indice + 1) % paletas.length;
+        // Animación de giro
+        robot.setAttribute('animation__spin', {
+          property: 'rotation',
+          to: '0 360 0',
+          dur: 900,
+          easing: 'easeInOutQuad'
+        });
+
+        setTimeout(function () {
+          robot.removeAttribute('animation__scale');
+          robot.removeAttribute('animation__spin');
+          robot.setAttribute('scale', '0.45 0.45 0.45');
+          robot.setAttribute('rotation', '0 0 0');
+          animando = false;
+        }, 1000);
+      }
+
+      btn.addEventListener('click', girarYAgrandar);
+      btn.addEventListener('touchstart', girarYAgrandar);
+    });
+  </script>
+
+</body>
+</html>
