@@ -3,47 +3,35 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delfín 3D en Realidad Aumentada</title>
+  <title>Delfín Realista 3D en Realidad Aumentada</title>
   <!-- Librerías de A-Frame y AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+  <!-- Extras de A-Frame para soportar animaciones del modelo 3D -->
+  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
   <!-- Desactivamos la interfaz de VR (vr-mode-ui) para evitar la pantalla dividida Cardboard -->
-  <a-scene embedded arjs vr-mode-ui="enabled: false">
+  <a-scene embedded arjs vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;">
     
+    <!-- Cargamos el recurso 3D del delfín -->
+    <a-assets>
+      <!-- Modelo 3D de un delfín realista y animado (gltf) -->
+      <a-asset-item id="modelo-delfin" src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Dolphin/glTF/Dolphin.gltf"></a-asset-item>
+    </a-assets>
+
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
       
-      <!-- Contenedor del Delfín con interacción -->
-      <a-entity id="delfin" position="0 0 0" scale="0.8 0.8 0.8" cursor-listener>
-        
-        <!-- Cuerpo principal -->
-        <a-cone position="0 0.6 0" radius-bottom="0.4" radius-top="0.05" height="1.6" color="#0088cc" rotation="90 0 0"></a-cone>
-        
-        <!-- Cabeza y hocico -->
-        <a-sphere position="0 0.6 -0.8" radius="0.3" color="#00aaee"></a-sphere>
-        <a-cone position="0 0.5 -1.1" radius-bottom="0.12" radius-top="0.02" height="0.5" color="#00aaee" rotation="90 0 0"></a-cone>
-        
-        <!-- Ojos -->
-        <a-sphere position="0.15 0.7 -0.8" radius="0.04" color="#000000"></a-sphere>
-        <a-sphere position="-0.15 0.7 -0.8" radius="0.04" color="#000000"></a-sphere>
-        
-        <!-- Aleta dorsal -->
-        <a-triangle vertex-a="0 0 0" vertex-b="0 0.5 -0.3" vertex-c="0 0 0.4" color="#0066aa" position="0 0.8 0.1"></a-triangle>
-        
-        <!-- Aletas laterales -->
-        <a-triangle vertex-a="0 0 0" vertex-b="0.6 -0.2 0.2" vertex-c="0.2 0 -0.3" color="#0066aa" position="0.2 0.5 -0.2"></a-triangle>
-        <a-triangle vertex-a="0 0 0" vertex-b="-0.6 -0.2 0.2" vertex-c="-0.2 0 -0.3" color="#0066aa" position="-0.2 0.5 -0.2"></a-triangle>
-        
-        <!-- Cola y aleta caudal -->
-        <a-cone position="0 0.6 1.1" radius-bottom="0.2" radius-top="0.05" height="0.8" color="#0088cc" rotation="90 0 0"></a-cone>
-        <a-triangle vertex-a="0 0 0" vertex-b="0.5 0 0.4" vertex-c="-0.5 0 0.4" color="#0066aa" position="0 0.6 1.5"></a-triangle>
-        
-        <!-- Vientre -->
-        <a-cone position="0 0.45 0" radius-bottom="0.38" radius-top="0.04" height="1.5" color="#e0f7fa" rotation="90 0 0"></a-cone>
-
+      <!-- Insertamos el modelo 3D con animación de nado continua (animation-mixer) -->
+      <a-entity id="delfin" 
+                gltf-model="#modelo-delfin" 
+                position="0 0 0" 
+                scale="0.01 0.01 0.01" 
+                rotation="0 180 0"
+                animation-mixer="clip: *; loop: repeat; timeScale: 1"
+                cursor-listener>
       </a-entity>
       
     </a-marker>
@@ -55,7 +43,7 @@
 
   </a-scene>
 
-  <!-- Script para la interacción (salto y giro al tocarlo en pantalla) -->
+  <!-- Script para interactividad (salto al tocarlo en pantalla) -->
   <script>
     AFRAME.registerComponent('cursor-listener', {
       init: function () {
@@ -66,29 +54,31 @@
           if (animando) return;
           animando = true;
 
+          // Efecto de salto/impulso hacia arriba y adelante
           el.setAttribute('animation__jump', {
             property: 'position',
-            to: '0 1.2 0',
+            to: '0 1.5 -1',
             dir: 'alternate',
-            dur: 500,
+            dur: 600,
             loop: 2,
             easing: 'easeOutQuad'
           });
 
+          // Un pequeño giro o pirueta mientras salta
           el.setAttribute('animation__spin', {
             property: 'rotation',
-            to: '0 360 0',
-            dur: 1000,
+            to: '0 540 0',
+            dur: 1200,
             easing: 'easeInOutQuad'
           });
 
           setTimeout(function () {
             el.removeAttribute('animation__jump');
             el.removeAttribute('animation__spin');
-            el.setAttribute('rotation', '0 0 0');
+            el.setAttribute('rotation', '0 180 0');
             el.setAttribute('position', '0 0 0');
             animando = false;
-          }, 1100);
+          }, 1300);
         });
       }
     });
