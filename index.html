@@ -2,19 +2,46 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Experiencia WebAR - Robot Interactivo</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+  <title>Experiencia WebAR - Robot Interactivo v2</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    /* Botón superpuesto en pantalla */
+    .btn-container {
+      position: absolute;
+      bottom: 20px;
+      left: 0;
+      width: 100%;
+      text-align: center;
+      z-index: 999999 !important;
+    }
+    #btn-accion {
+      background: #ec4899;
+      color: #ffffff;
+      border: 3px solid #ffffff;
+      padding: 14px 28px;
+      font-size: 18px;
+      font-weight: bold;
+      border-radius: 30px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+      cursor: pointer;
+    }
+  </style>
 </head>
 <body style="margin: 0; overflow: hidden;">
+
+  <!-- BOTÓN INTERACTIVO PUESTO POR ENCIMA DE LA CÁMARA -->
+  <div class="btn-container">
+    <button id="btn-accion">🔄 GIRAR Y AGRANDAR</button>
+  </div>
 
   <a-scene embedded 
            arjs="sourceType: webcam; debugUIEnabled: false;" 
            vr-mode-ui="enabled: false"
            renderer="logarithmicDepthBuffer: true;">
 
-    <!-- Iluminación -->
     <a-light type="ambient" color="#ffffff" intensity="0.9"></a-light>
     <a-light type="directional" color="#ffffff" intensity="0.6" position="-1 4 2"></a-light>
 
@@ -25,14 +52,7 @@
       <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#ffffff"></a-cylinder>
       <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#f43f5e" rotation="-90 0 0"></a-ring>
 
-      <!-- BOTÓN 3D EN RA (Frente al robot) -->
-      <a-entity id="btn-3d" position="0 0.15 0.7">
-        <a-cylinder radius="0.3" height="0.08" color="#f43f5e"></a-cylinder>
-        <a-cylinder id="btn-top" radius="0.25" height="0.12" position="0 0.02 0" color="#38bdf8"></a-cylinder>
-        <a-text value="GIRAR" align="center" position="0 0.1 0" rotation="-90 0 0" scale="0.4 0.4 0.4" color="#ffffff"></a-text>
-      </a-entity>
-
-      <!-- ROBOT ERGUIDO -->
+      <!-- ROBOT ERGUIDO DE PIE -->
       <a-entity id="robot" 
                 position="0 0.3 0" 
                 scale="0.45 0.45 0.45" 
@@ -71,77 +91,30 @@
 
     </a-marker>
 
-    <!-- Cámara con raycaster activo mediante el cursor de pantalla táctil -->
-    <a-entity camera position="0 0 0">
-      <a-cursor raycaster="objects: a-box, a-cylinder, a-sphere, #btn-3d" fuse="false" cursor="rayOrigin: mouse"></a-cursor>
-    </a-entity>
+    <a-entity camera></a-entity>
 
   </a-scene>
 
-  <!-- JAVASCRIPT DIRECTO DE INTERACCIÓN TÁCTIL (PROBADO Y FUNCIONAL) -->
+  <!-- JAVASCRIPT GLOBAL -->
   <script>
-    window.addEventListener('DOMContentLoaded', function () {
-      var robot = document.querySelector('#robot');
-      var cabeza = document.querySelector('#cabeza');
-      var cuerpo = document.querySelector('#cuerpo');
-      var btn3D = document.querySelector('#btn-3d');
-      
+    document.addEventListener("DOMContentLoaded", function () {
+      var robot = document.querySelector("#robot");
+      var cabeza = document.querySelector("#cabeza");
+      var cuerpo = document.querySelector("#cuerpo");
+      var btn = document.querySelector("#btn-accion");
       var animando = false;
 
-      // Paleta de combinaciones de colores
       var paletas = [
-        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
-        { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
-        { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Cyan y Morado
+        { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Verde y Azul
+        { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Amarillo y Rojo
+        { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Turquesa y Morado
         { cabeza: '#f43f5e', cuerpo: '#14b8a6' }, // Fucsia y Esmeralda
         { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
       ];
-      var indiceColor = 0;
+      var indice = 0;
 
-      // Evento del botón 3D: Girar y Agrandar
-      btn3D.addEventListener('click', function (e) {
-        e.stopPropagation();
-        if (animando) return;
-        animando = true;
+      // 1. CAMBIO DE COLOR AL TOCAR LA CÁMARA/PANTALLA
+      document.body.addEventListener("click", function (e) {
+        if (e.target === btn) return; // Si toca el botón no cambia color
 
-        btn3D.setAttribute('position', '0 0.1 0.7');
-
-        // Aumenta de tamaño (escala)
-        robot.setAttribute('animation__scale', {
-          property: 'scale',
-          to: '0.65 0.65 0.65',
-          dir: 'alternate',
-          dur: 400,
-          loop: 2,
-          easing: 'easeOutQuad'
-        });
-
-        // Giro de 360 grados (rotación)
-        robot.setAttribute('animation__spin', {
-          property: 'rotation',
-          to: '0 360 0',
-          dur: 900,
-          easing: 'easeInOutQuad'
-        });
-
-        setTimeout(function () {
-          btn3D.setAttribute('position', '0 0.15 0.7');
-          robot.removeAttribute('animation__scale');
-          robot.removeAttribute('animation__spin');
-          robot.setAttribute('scale', '0.45 0.45 0.45');
-          robot.setAttribute('rotation', '0 0 0');
-          animando = false;
-        }, 1000);
-      });
-
-      // Evento de toque en el Robot: Cambiar de color
-      robot.addEventListener('click', function () {
-        indiceColor = (indiceColor + 1) % paletas.length;
-        cabeza.setAttribute('material', 'color', paletas[indiceColor].cabeza);
-        cuerpo.setAttribute('material', 'color', paletas[indiceColor].cuerpo);
-      });
-    });
-  </script>
-
-</body>
-</html>
+        indice = (indice + 1) % paletas.length;
