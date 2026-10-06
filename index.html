@@ -3,47 +3,60 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delfín Realista 3D en Realidad Aumentada</title>
-  <!-- Librerías de A-Frame y AR.js -->
+  <title>Delfín 3D en Realidad Aumentada</title>
+  <!-- Script de A-Frame estable -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
+  <!-- Script de AR.js estable -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <!-- Extras de A-Frame para soportar animaciones del modelo 3D -->
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Desactivamos la interfaz de VR (vr-mode-ui) para evitar la pantalla dividida Cardboard -->
-  <a-scene embedded arjs vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;">
+  <!-- Configuración estable de escena AR sin bloqueo de pantalla -->
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
     
-    <!-- Cargamos el recurso 3D del delfín -->
-    <a-assets>
-      <!-- Modelo 3D de un delfín realista y animado (gltf) -->
-      <a-asset-item id="modelo-delfin" src="https://raw.githubusercontent.com/KhronosGroup/glTF-Sample-Models/master/2.0/Dolphin/glTF/Dolphin.gltf"></a-asset-item>
-    </a-assets>
-
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
       
-      <!-- Insertamos el modelo 3D con animación de nado continua (animation-mixer) -->
-      <a-entity id="delfin" 
-                gltf-model="#modelo-delfin" 
-                position="0 0 0" 
-                scale="0.01 0.01 0.01" 
-                rotation="0 180 0"
-                animation-mixer="clip: *; loop: repeat; timeScale: 1"
-                cursor-listener>
+      <!-- Delfín con formas suaves y pulidas (Anatomía detallada) -->
+      <a-entity id="delfin" position="0 0.5 0" scale="0.8 0.8 0.8" cursor-listener>
+        
+        <!-- Cuerpo aerodinámico principal -->
+        <a-cone position="0 0 0" radius-bottom="0.35" radius-top="0.08" height="1.8" color="#0077be" rotation="90 0 0" material="roughness: 0.3; metalness: 0.1"></a-cone>
+        
+        <!-- Cabeza y Hocico alargado -->
+        <a-sphere position="0 0 -0.9" radius="0.33" color="#0088cc" material="roughness: 0.3"></a-sphere>
+        <a-cone position="0 -0.05 -1.25" radius-bottom="0.1" radius-top="0.02" height="0.6" color="#0099dd" rotation="90 0 0"></a-cone>
+        
+        <!-- Ojos -->
+        <a-sphere position="0.16 0.1 -0.95" radius="0.035" color="#111111"></a-sphere>
+        <a-sphere position="-0.16 0.1 -0.95" radius="0.035" color="#111111"></a-sphere>
+        
+        <!-- Aleta Dorsal Curvada -->
+        <a-triangle vertex-a="0 0 0" vertex-b="0 0.6 -0.3" vertex-c="0 0 0.5" color="#005599" position="0 0.35 0.1"></a-triangle>
+        
+        <!-- Aletas Pectorales Laterales -->
+        <a-triangle vertex-a="0 0 0" vertex-b="0.7 -0.2 0.3" vertex-c="0.2 0 -0.3" color="#005599" position="0.2 0 -0.2"></a-triangle>
+        <a-triangle vertex-a="0 0 0" vertex-b="-0.7 -0.2 0.3" vertex-c="-0.2 0 -0.3" color="#005599" position="-0.2 0 -0.2"></a-triangle>
+        
+        <!-- Cola y Aleta Caudal (Doble aleta posterior) -->
+        <a-cone position="0 0 1.2" radius-bottom="0.2" radius-top="0.05" height="0.9" color="#0077be" rotation="90 0 0"></a-cone>
+        <a-triangle vertex-a="0 0 0" vertex-b="0.6 0 0.4" vertex-c="-0.6 0 0.4" color="#005599" position="0 0 1.6"></a-triangle>
+        
+        <!-- Vientre blanco luminoso -->
+        <a-cone position="0 -0.08 0" radius-bottom="0.32" radius-top="0.06" height="1.7" color="#e0f7fa" rotation="90 0 0"></a-cone>
+
       </a-entity>
       
     </a-marker>
 
-    <!-- Cámara para detección e interacción táctil -->
+    <!-- Cámara principal -->
     <a-entity camera>
       <a-cursor raycaster="objects: [cursor-listener]" fuse="false"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- Script para interactividad (salto al tocarlo en pantalla) -->
+  <!-- Control de interacción táctil -->
   <script>
     AFRAME.registerComponent('cursor-listener', {
       init: function () {
@@ -54,31 +67,30 @@
           if (animando) return;
           animando = true;
 
-          // Efecto de salto/impulso hacia arriba y adelante
+          // Animación de salto curvo
           el.setAttribute('animation__jump', {
             property: 'position',
-            to: '0 1.5 -1',
+            to: '0 1.5 0',
             dir: 'alternate',
-            dur: 600,
+            dur: 500,
             loop: 2,
             easing: 'easeOutQuad'
           });
 
-          // Un pequeño giro o pirueta mientras salta
           el.setAttribute('animation__spin', {
             property: 'rotation',
-            to: '0 540 0',
-            dur: 1200,
+            to: '0 360 0',
+            dur: 1000,
             easing: 'easeInOutQuad'
           });
 
           setTimeout(function () {
             el.removeAttribute('animation__jump');
             el.removeAttribute('animation__spin');
-            el.setAttribute('rotation', '0 180 0');
-            el.setAttribute('position', '0 0 0');
+            el.setAttribute('rotation', '0 0 0');
+            el.setAttribute('position', '0 0.5 0');
             animando = false;
-          }, 1300);
+          }, 1100);
         });
       }
     });
