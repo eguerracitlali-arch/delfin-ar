@@ -3,45 +3,61 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delfín 3D Realista AR</title>
-  <!-- Librerías A-Frame y AR.js -->
+  <title>Delfín 3D AR</title>
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
-  <!-- Soporte para animación 3D -->
-  <script src="https://cdn.jsdelivr.net/gh/donmccurdy/aframe-extras@v6.1.1/dist/aframe-extras.min.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
   <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
     
-    <a-assets>
-      <!-- Enlace directo seguro CDN al modelo 3D del delfín -->
-      <a-asset-item id="delfin-model" src="https://cdn.jsdelivr.net/gh/KhronosGroup/glTF-Sample-Models@master/2.0/Dolphin/glTF-Binary/Dolphin.glb" crossorigin="anonymous"></a-asset-item>
-    </a-assets>
+    <!-- Luces para dar profundidad y volumen real al delfín -->
+    <a-light type="ambient" color="#ffffff" intensity="0.8"></a-light>
+    <a-light type="directional" color="#e0f7fa" intensity="0.6" position="-1 3 2"></a-light>
 
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
       
-      <!-- Modelo 3D del delfín nadando horizontalmente -->
-      <a-entity id="delfin" 
-                gltf-model="#delfin-model" 
-                position="0 0.3 0" 
-                scale="0.012 0.012 0.012" 
-                rotation="-90 0 0"
-                animation-mixer="clip: *; loop: repeat; timeScale: 1"
-                cursor-listener>
+      <!-- Delfín con silueta horizontal y estilizada -->
+      <a-entity id="delfin" position="0 0.3 0" rotation="0 90 0" scale="0.8 0.8 0.8" cursor-listener>
+        
+        <!-- Cabeza y hocico fino -->
+        <a-sphere position="0.85 0 0" radius-x="0.35" radius-y="0.2" radius-z="0.2" color="#0088cc" material="roughness: 0.2; metalness: 0.1"></a-sphere>
+        <a-cone position="1.25 -0.02 0" radius-bottom="0.07" radius-top="0.01" height="0.45" color="#0099ee" rotation="0 0 -90"></a-cone>
+        
+        <!-- Ojos -->
+        <a-sphere position="0.95 0.08 0.14" radius="0.03" color="#000000"></a-sphere>
+        <a-sphere position="0.95 0.08 -0.14" radius="0.03" color="#000000"></a-sphere>
+
+        <!-- Cuerpo central hidrodinámico -->
+        <a-sphere position="0.25 0.02 0" radius-x="0.5" radius-y="0.24" radius-z="0.24" color="#0077be" material="roughness: 0.2"></a-sphere>
+        <a-sphere position="-0.3 0 0" radius-x="0.4" radius-y="0.18" radius-z="0.18" color="#0066aa" material="roughness: 0.2"></a-sphere>
+        
+        <!-- Cola en curvatura natural hacia arriba -->
+        <a-cone position="-0.75 0.08 0" radius-bottom="0.14" radius-top="0.03" height="0.55" color="#005599" rotation="0 0 75"></a-cone>
+        
+        <!-- Aleta Caudal (Cola posterior) -->
+        <a-triangle vertex-a="0 0 0" vertex-b="-0.25 0.35 0.18" vertex-c="-0.25 0.35 -0.18" color="#004488" position="-1.0 0.28 0"></a-triangle>
+
+        <!-- Aleta Dorsal -->
+        <a-triangle vertex-a="0 0 0" vertex-b="-0.2 0.38 0" vertex-c="0.15 0 0" color="#004488" position="0.15 0.18 0"></a-triangle>
+        
+        <!-- Aletas Pectorales (Laterales inclinadas) -->
+        <a-triangle vertex-a="0 0 0" vertex-b="-0.18 -0.18 0.3" vertex-c="0.1 0 0.08" color="#004488" position="0.45 -0.05 0.1"></a-triangle>
+        <a-triangle vertex-a="0 0 0" vertex-b="-0.18 -0.18 -0.3" vertex-c="0.1 0 -0.08" color="#004488" position="0.45 -0.05 -0.1"></a-triangle>
+
       </a-entity>
       
     </a-marker>
 
-    <!-- Cámara para detección táctil -->
+    <!-- Cámara principal -->
     <a-entity camera>
       <a-cursor raycaster="objects: [cursor-listener]" fuse="false"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- Script para la interacción táctil (salto al tocar) -->
+  <!-- Animación al tocar -->
   <script>
     AFRAME.registerComponent('cursor-listener', {
       init: function () {
@@ -54,27 +70,27 @@
 
           el.setAttribute('animation__jump', {
             property: 'position',
-            to: '0 1.2 -0.5',
+            to: '0 1.2 0',
             dir: 'alternate',
-            dur: 600,
+            dur: 500,
             loop: 2,
             easing: 'easeOutQuad'
           });
 
           el.setAttribute('animation__spin', {
             property: 'rotation',
-            to: '-90 360 0',
-            dur: 1200,
+            to: '0 450 0',
+            dur: 1000,
             easing: 'easeInOutQuad'
           });
 
           setTimeout(function () {
             el.removeAttribute('animation__jump');
             el.removeAttribute('animation__spin');
-            el.setAttribute('rotation', '-90 0 0');
+            el.setAttribute('rotation', '0 90 0');
             el.setAttribute('position', '0 0.3 0');
             animando = false;
-          }, 1300);
+          }, 1100);
         });
       }
     });
