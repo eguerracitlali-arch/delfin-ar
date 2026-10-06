@@ -21,44 +21,44 @@
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
 
-      <!-- PISO / REFERENCIA VISUAL (Plataforma blanca con borde fucsia pastel) -->
+      <!-- PISO / REFERENCIA VISUAL -->
       <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#ffffff"></a-cylinder>
       <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#f43f5e" rotation="-90 0 0"></a-ring>
 
-      <!-- ROBOT (Colores definidos: Lila, Rosa y Celeste) -->
+      <!-- ROBOT ERGUIDO COMPLETAMENTE DE PIE (rotation="0 0 0") -->
       <a-entity id="robot" 
                 class="clickable"
-                position="0 0.1 0" 
+                position="0 0.3 0" 
                 scale="0.45 0.45 0.45" 
-                rotation="-90 0 0" 
+                rotation="0 0 0" 
                 interaccion-robot>
 
-        <!-- Cabeza (Lila vibrante) -->
+        <!-- Cabeza -->
         <a-box id="cabeza" class="clickable" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#a855f7"></a-box>
 
-        <!-- Ojos (Celeste brillante) -->
+        <!-- Ojos -->
         <a-sphere class="clickable" position="-0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
         <a-sphere class="clickable" position="0.15 1.28 0.26" radius="0.08" color="#38bdf8"></a-sphere>
 
-        <!-- Antena con luz fucsia -->
+        <!-- Antena -->
         <a-cylinder class="clickable" position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
         <a-sphere class="clickable" position="0 1.68 0" radius="0.07" color="#f43f5e"></a-sphere>
 
         <!-- Cuello -->
         <a-cylinder class="clickable" position="0 0.9 0" radius="0.1" height="0.1" color="#cbd5e1"></a-cylinder>
 
-        <!-- Cuerpo / Torso (Rosa fucsia brillante) -->
+        <!-- Torso -->
         <a-box id="cuerpo" class="clickable" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#ec4899"></a-box>
         
         <!-- Panel del pecho -->
         <a-plane class="clickable" position="0 0.45 0.31" width="0.4" height="0.4" color="#a855f7"></a-plane>
         <a-circle class="clickable" position="0 0.45 0.32" radius="0.1" color="#38bdf8"></a-circle>
 
-        <!-- Brazos (Lila) -->
+        <!-- Brazos -->
         <a-cylinder class="clickable" position="-0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 15"></a-cylinder>
         <a-cylinder class="clickable" position="0.52 0.5 0" radius="0.08" height="0.6" color="#a855f7" rotation="0 0 -15"></a-cylinder>
 
-        <!-- Piernas (Azul/Gris oscuro para dar contraste) -->
+        <!-- Piernas firmes sobre la base -->
         <a-cylinder class="clickable" position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
         <a-cylinder class="clickable" position="0.2 -0.1 0" radius="0.1" height="0.4" color="#475569"></a-cylinder>
 
@@ -66,14 +66,14 @@
 
     </a-marker>
 
-    <!-- Cámara con raycaster amplio y soporte táctil -->
+    <!-- Cámara -->
     <a-entity camera>
       <a-cursor raycaster="objects: .clickable" fuse="false" cursor="rayOrigin: mouse"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- Script de Interacción Táctil JS + RA -->
+  <!-- Script de Interacción -->
   <script>
     AFRAME.registerComponent('interaccion-robot', {
       init: function () {
@@ -82,13 +82,12 @@
         var cuerpo = document.querySelector('#cuerpo');
         var animando = false;
 
-        // Combinaciones de colores combinados para cabeza y cuerpo
         var paletas = [
-          { cabeza: '#ec4899', cuerpo: '#a855f7' }, // Rosa y Lila
-          { cabeza: '#10b981', cuerpo: '#3b82f6' }, // Menta y Azul
-          { cabeza: '#f59e0b', cuerpo: '#ef4444' }, // Ámbar y Rojo
-          { cabeza: '#06b6d4', cuerpo: '#8b5cf6' }, // Cyan y Morado
-          { cabeza: '#a855f7', cuerpo: '#ec4899' }  // Lila y Rosa
+          { cabeza: '#ec4899', cuerpo: '#a855f7' },
+          { cabeza: '#10b981', cuerpo: '#3b82f6' },
+          { cabeza: '#f59e0b', cuerpo: '#ef4444' },
+          { cabeza: '#06b6d4', cuerpo: '#8b5cf6' },
+          { cabeza: '#a855f7', cuerpo: '#ec4899' }
         ];
         var indice = 0;
 
@@ -96,12 +95,12 @@
           if (animando) return;
           animando = true;
 
-          // 1. Cambio de Color en Vivo
+          // 1. Cambio de Color
           indice = (indice + 1) % paletas.length;
           cabeza.setAttribute('material', 'color', paletas[indice].cabeza);
           cuerpo.setAttribute('material', 'color', paletas[indice].cuerpo);
 
-          // 2. Cambio de Tamaño (Agranda a 0.65)
+          // 2. Cambio de Escala
           el.setAttribute('animation__scale', {
             property: 'scale',
             to: '0.65 0.65 0.65',
@@ -111,25 +110,23 @@
             easing: 'easeOutQuad'
           });
 
-          // 3. Giro de 360 grados
+          // 3. Giro de 360 grados mantenido erguido
           el.setAttribute('animation__spin', {
             property: 'rotation',
-            to: '-90 360 0',
+            to: '0 360 0',
             dur: 900,
             easing: 'easeInOutQuad'
           });
 
-          // Restaurar animación
           setTimeout(function () {
             el.removeAttribute('animation__scale');
             el.removeAttribute('animation__spin');
             el.setAttribute('scale', '0.45 0.45 0.45');
-            el.setAttribute('rotation', '-90 0 0');
+            el.setAttribute('rotation', '0 0 0');
             animando = false;
           }, 1000);
         }
 
-        // Eventos táctiles para móviles y clicks de mouse
         el.addEventListener('click', ejecutarAnimacion);
         el.addEventListener('touchstart', ejecutarAnimacion);
       }
