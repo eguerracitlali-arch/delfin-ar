@@ -3,56 +3,130 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Delfín 3D AR</title>
-  <!-- Librería base de A-Frame -->
+  <title>Experiencia WebAR - Robot Interactivo</title>
+  <!-- Librerías de A-Frame y AR.js -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <!-- AR.js para detección de cámara y marcador -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- Escena AR optimizada para móviles -->
-  <a-scene embedded arjs="sourceType: webcam;" vr-mode-ui="enabled: false">
-    
+  <!-- Configuración de escena AR con cámara suavizada (smoothing) para evitar zoom excesivo -->
+  <a-scene embedded 
+           arjs="sourceType: webcam; debugUIEnabled: false; smooth: true; smoothCount: 10; smoothTolerance: 0.01; smoothThreshold: 5;" 
+           vr-mode-ui="enabled: false">
+
+    <!-- Luces para resaltar texturas y sombras -->
+    <a-light type="ambient" color="#ffffff" intensity="0.8"></a-light>
+    <a-light type="directional" color="#00e5ff" intensity="0.6" position="-1 4 2"></a-light>
+
     <!-- Marcador Hiro -->
-    <a-marker preset="hiro">
-      
-      <!-- Delfín horizontal estilizado -->
-      <a-entity id="delfin" position="0 0.2 0" rotation="0 90 0" scale="0.7 0.7 0.7">
-        
-        <!-- Cabeza y hocico -->
-        <a-sphere position="0.85 0 0" radius-x="0.35" radius-y="0.2" radius-z="0.2" color="#0088cc"></a-sphere>
-        <a-cone position="1.25 -0.02 0" radius-bottom="0.07" radius-top="0.01" height="0.45" color="#0099ee" rotation="0 0 -90"></a-cone>
-        
-        <!-- Ojos -->
-        <a-sphere position="0.95 0.08 0.14" radius="0.03" color="#000000"></a-sphere>
-        <a-sphere position="0.95 0.08 -0.14" radius="0.03" color="#000000"></a-sphere>
+    <a-marker preset="hiro" id="marker-hiro">
 
-        <!-- Cuerpo central -->
-        <a-sphere position="0.25 0.02 0" radius-x="0.5" radius-y="0.24" radius-z="0.24" color="#0077be"></a-sphere>
-        <a-sphere position="-0.3 0 0" radius-x="0.4" radius-y="0.18" radius-z="0.18" color="#0066aa"></a-sphere>
-        
-        <!-- Cola en curvatura hacia arriba -->
-        <a-cone position="-0.75 0.08 0" radius-bottom="0.14" radius-top="0.03" height="0.55" color="#005599" rotation="0 0 75"></a-cone>
-        
-        <!-- Aleta Caudal (Posterior) -->
-        <a-triangle vertex-a="0 0 0" vertex-b="-0.25 0.35 0.18" vertex-c="-0.25 0.35 -0.18" color="#004488" position="-1.0 0.28 0"></a-triangle>
+      <!-- REQUISITO 2: Piso o Referencia Visual (Plataforma tecnológica) -->
+      <a-cylinder position="0 0 0" radius="1.2" height="0.05" color="#111827" opacity="0.85"></a-cylinder>
+      <a-ring position="0 0.03 0" radius-inner="0.8" radius-outer="1.1" color="#00e5ff" rotation="-90 0 0" opacity="0.9"></a-ring>
 
-        <!-- Aleta Dorsal -->
-        <a-triangle vertex-a="0 0 0" vertex-b="-0.2 0.38 0" vertex-c="0.15 0 0" color="#004488" position="0.15 0.18 0"></a-triangle>
+      <!-- REQUISITO 1, 3, 4 y 5: Objeto 3D (Robot) con Posición, Tamaño (Escala) y Rotación configurados -->
+      <!-- REQUISITO 6: Experiencia RA con interacción registrada por 'interaccion-robot' -->
+      <a-entity id="robot" 
+                position="0 0.3 0" 
+                scale="0.5 0.5 0.5" 
+                rotation="0 0 0" 
+                interaccion-robot>
+
+        <!-- Cabeza -->
+        <a-box id="cabeza" position="0 1.2 0" width="0.6" height="0.5" depth="0.5" color="#3b82f6" material="roughness: 0.3; metalness: 0.4"></a-box>
+
+        <!-- Ojos luminosos -->
+        <a-sphere position="-0.15 1.28 0.26" radius="0.08" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.8"></a-sphere>
+        <a-sphere position="0.15 1.28 0.26" radius="0.08" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.8"></a-sphere>
+
+        <!-- Antena con esfera reflectante -->
+        <a-cylinder position="0 1.55 0" radius="0.02" height="0.2" color="#64748b"></a-cylinder>
+        <a-sphere position="0 1.68 0" radius="0.06" color="#ef4444" material="emissive: #ef4444; emissiveIntensity: 0.5"></a-sphere>
+
+        <!-- Cuello -->
+        <a-cylinder position="0 0.9 0" radius="0.1" height="0.1" color="#475569"></a-cylinder>
+
+        <!-- Cuerpo / Torso -->
+        <a-box id="cuerpo" position="0 0.45 0" width="0.8" height="0.8" depth="0.6" color="#1d4ed8" material="roughness: 0.3; metalness: 0.4"></a-box>
         
-        <!-- Aletas Pectorales (Laterales) -->
-        <a-triangle vertex-a="0 0 0" vertex-b="-0.18 -0.18 0.3" vertex-c="0.1 0 0.08" color="#004488" position="0.45 -0.05 0.1"></a-triangle>
-        <a-triangle vertex-a="0 0 0" vertex-b="-0.18 -0.18 -0.3" vertex-c="0.1 0 -0.08" color="#004488" position="0.45 -0.05 -0.1"></a-triangle>
+        <!-- Panel del pecho (Corazón del Robot) -->
+        <a-plane position="0 0.45 0.31" width="0.4" height="0.4" color="#0f172a"></a-plane>
+        <a-circle position="0 0.45 0.32" radius="0.1" color="#00ffcc" material="emissive: #00ffcc; emissiveIntensity: 0.6"></a-circle>
+
+        <!-- Brazos -->
+        <a-cylinder position="-0.52 0.5 0" radius="0.08" height="0.6" color="#3b82f6" rotation="0 0 15"></a-cylinder>
+        <a-cylinder position="0.52 0.5 0" radius="0.08" height="0.6" color="#3b82f6" rotation="0 0 -15"></a-cylinder>
+
+        <!-- Piernas -->
+        <a-cylinder position="-0.2 -0.1 0" radius="0.1" height="0.4" color="#1e293b"></a-cylinder>
+        <a-cylinder position="0.2 -0.1 0" radius="0.1" height="0.4" color="#1e293b"></a-cylinder>
 
       </a-entity>
-      
+
     </a-marker>
 
-    <!-- Cámara para renderizado -->
-    <a-entity camera></a-entity>
+    <!-- Cámara ajustada sin zoom excesivo y con raycaster táctil -->
+    <a-entity camera position="0 0 0">
+      <a-cursor raycaster="objects: [interaccion-robot]" fuse="false"></a-cursor>
+    </a-entity>
 
   </a-scene>
+
+  <!-- INTERACCIÓN JAVASCRIPT (+ RA) -->
+  <script>
+    AFRAME.registerComponent('interaccion-robot', {
+      init: function () {
+        var el = this.el;
+        var cabeza = document.querySelector('#cabeza');
+        var cuerpo = document.querySelector('#cuerpo');
+        var animando = false;
+
+        // Lista de colores para cambiar al tocar el robot
+        var colores = ['#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899', '#3b82f6'];
+        var indiceColor = 0;
+
+        el.addEventListener('click', function () {
+          if (animando) return;
+          animando = true;
+
+          // 1. Cambio de Color mediante JavaScript
+          indiceColor = (indiceColor + 1) % colores.length;
+          var nuevoColor = colores[indiceColor];
+          cabeza.setAttribute('material', 'color', nuevoColor);
+          cuerpo.setAttribute('material', 'color', nuevoColor);
+
+          // 2. Cambio temporal de tamaño (Escala) y posición al tocarlo
+          el.setAttribute('animation__scale', {
+            property: 'scale',
+            to: '0.65 0.65 0.65',
+            dir: 'alternate',
+            dur: 300,
+            loop: 2,
+            easing: 'easeOutQuad'
+          });
+
+          // 3. Giro de 360 grados (Rotación)
+          el.setAttribute('animation__spin', {
+            property: 'rotation',
+            to: '0 360 0',
+            dur: 800,
+            easing: 'easeInOutQuad'
+          });
+
+          // Restablecer valores tras finalizar la animación
+          setTimeout(function () {
+            el.removeAttribute('animation__scale');
+            el.removeAttribute('animation__spin');
+            el.setAttribute('scale', '0.5 0.5 0.5');
+            el.setAttribute('rotation', '0 0 0');
+            animando = false;
+          }, 900);
+        });
+      }
+    });
+  </script>
 
 </body>
 </html>
