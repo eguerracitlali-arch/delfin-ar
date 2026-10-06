@@ -9,7 +9,6 @@
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- logarithmicDepthBuffer: true elimina el parpadeo en el piso -->
   <a-scene embedded 
            arjs="sourceType: webcam; debugUIEnabled: false;" 
            vr-mode-ui="enabled: false"
@@ -21,15 +20,15 @@
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
 
-      <!-- PISO / REFERENCIA VISUAL (Separado para evitar solapamiento) -->
+      <!-- PISO / REFERENCIA VISUAL -->
       <a-cylinder position="0 0 0" radius="1.1" height="0.02" color="#111827"></a-cylinder>
       <a-ring position="0 0.02 0" radius-inner="0.85" radius-outer="1.0" color="#00e5ff" rotation="-90 0 0"></a-ring>
 
-      <!-- ROBOT DE FRENTE (Rotado 90° en X para quedar de pie orientado a la cámara) -->
+      <!-- ROBOT DE PIE (Corregido a -90° para que la cabeza quede arriba y las piernas en la base) -->
       <a-entity id="robot" 
-                position="0 0.4 0" 
+                position="0 0.1 0" 
                 scale="0.45 0.45 0.45" 
-                rotation="90 0 0" 
+                rotation="-90 0 0" 
                 interaccion-robot>
 
         <!-- Cabeza -->
@@ -65,14 +64,14 @@
 
     </a-marker>
 
-    <!-- Cámara para detección táctil -->
+    <!-- Cámara con raycaster táctil -->
     <a-entity camera>
       <a-cursor raycaster="objects: [interaccion-robot]" fuse="false"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- Script de interacción JS -->
+  <!-- Script de interacción táctil JS -->
   <script>
     AFRAME.registerComponent('interaccion-robot', {
       init: function () {
@@ -107,7 +106,7 @@
           // 3. Giro de 360 grados
           el.setAttribute('animation__spin', {
             property: 'rotation',
-            to: '90 360 0',
+            to: '-90 360 0',
             dur: 800,
             easing: 'easeInOutQuad'
           });
@@ -116,7 +115,7 @@
             el.removeAttribute('animation__scale');
             el.removeAttribute('animation__spin');
             el.setAttribute('scale', '0.45 0.45 0.45');
-            el.setAttribute('rotation', '90 0 0');
+            el.setAttribute('rotation', '-90 0 0');
             animando = false;
           }, 900);
         });
