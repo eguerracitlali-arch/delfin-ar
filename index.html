@@ -4,59 +4,52 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Delfín 3D en Realidad Aumentada</title>
-  <!-- Script de A-Frame -->
+  <!-- Scripts esenciales -->
   <script src="https://aframe.io/releases/1.2.0/aframe.min.js"></script>
-  <!-- Script de AR.js -->
   <script src="https://raw.githack.com/AR-js-org/AR.js/master/aframe/build/aframe-ar.js"></script>
 </head>
 <body style="margin: 0; overflow: hidden;">
 
-  <!-- logarithmicDepthBuffer evita el parpadeo de texturas en móviles -->
-  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false" renderer="logarithmicDepthBuffer: true;">
+  <a-scene embedded arjs="sourceType: webcam; debugUIEnabled: false;" vr-mode-ui="enabled: false">
     
     <!-- Marcador Hiro -->
     <a-marker preset="hiro" id="marker-hiro">
       
-      <!-- Delfín con formas orgánicas estilizadas -->
-      <a-entity id="delfin" position="0 0.5 0" scale="0.6 0.6 0.6" cursor-listener>
+      <!-- Delfín unificado sin figuras encimadas -->
+      <a-entity id="delfin" position="0 0.5 0" scale="0.7 0.7 0.7" cursor-listener>
         
-        <!-- Cuerpo principal (Esferas estiradas para suavidad) -->
-        <a-sphere position="0 0 0" radius-x="0.3" radius-y="0.3" radius-z="0.9" color="#0088cc"></a-sphere>
+        <!-- Cuerpo principal azul -->
+        <a-cone position="0 0 0" radius-bottom="0.3" radius-top="0.05" height="1.6" color="#0088cc" rotation="90 0 0"></a-cone>
         
-        <!-- Cabeza y Hocico -->
-        <a-sphere position="0 0.05 -0.8" radius-x="0.25" radius-y="0.25" radius-z="0.4" color="#0099ee"></a-sphere>
-        <a-cone position="0 -0.05 -1.2" radius-bottom="0.08" radius-top="0.02" height="0.5" color="#0099ee" rotation="90 0 0"></a-cone>
+        <!-- Cabeza y hocico -->
+        <a-sphere position="0 0 -0.8" radius="0.28" color="#0088cc"></a-sphere>
+        <a-cone position="0 -0.05 -1.1" radius-bottom="0.09" radius-top="0.02" height="0.5" color="#0088cc" rotation="90 0 0"></a-cone>
         
         <!-- Ojos -->
-        <a-sphere position="0.15 0.1 -0.85" radius="0.03" color="#000000"></a-sphere>
-        <a-sphere position="-0.15 0.1 -0.85" radius="0.03" color="#000000"></a-sphere>
-        
-        <!-- Vientre blanco (ligeramente desplazado hacia abajo para eliminar el parpadeo) -->
-        <a-sphere position="0 -0.05 -0.05" radius-x="0.26" radius-y="0.24" radius-z="0.85" color="#e0f7fa"></a-sphere>
+        <a-sphere position="0.14 0.1 -0.85" radius="0.03" color="#000000"></a-sphere>
+        <a-sphere position="-0.14 0.1 -0.85" radius="0.03" color="#000000"></a-sphere>
 
         <!-- Aleta Dorsal -->
-        <a-triangle vertex-a="0 0 0" vertex-b="0 0.5 -0.2" vertex-c="0 0 0.4" color="#0066aa" position="0 0.25 0.1"></a-triangle>
+        <a-triangle vertex-a="0 0 0" vertex-b="0 0.45 -0.2" vertex-c="0 0 0.35" color="#005599" position="0 0.28 0.1"></a-triangle>
         
         <!-- Aletas Pectorales (Laterales) -->
-        <a-triangle vertex-a="0 0 0" vertex-b="0.6 -0.1 0.2" vertex-c="0.2 0 -0.2" color="#0066aa" position="0.15 -0.05 -0.2"></a-triangle>
-        <a-triangle vertex-a="0 0 0" vertex-b="-0.6 -0.1 0.2" vertex-c="-0.2 0 -0.2" color="#0066aa" position="-0.15 -0.05 -0.2"></a-triangle>
+        <a-triangle vertex-a="0 0 0" vertex-b="0.55 -0.1 0.2" vertex-c="0.2 0 -0.2" color="#005599" position="0.15 0 -0.2"></a-triangle>
+        <a-triangle vertex-a="0 0 0" vertex-b="-0.55 -0.1 0.2" vertex-c="-0.2 0 -0.2" color="#005599" position="-0.15 0 -0.2"></a-triangle>
         
         <!-- Cola y Aleta Caudal -->
-        <a-cone position="0 0 1.0" radius-bottom="0.18" radius-top="0.04" height="0.7" color="#0088cc" rotation="90 0 0"></a-cone>
-        <a-triangle vertex-a="0 0 0" vertex-b="0.5 0 0.3" vertex-c="-0.5 0 0.3" color="#0066aa" position="0 0 1.35"></a-triangle>
+        <a-cone position="0 0 0.95" radius-bottom="0.16" radius-top="0.04" height="0.6" color="#0088cc" rotation="90 0 0"></a-cone>
+        <a-triangle vertex-a="0 0 0" vertex-b="0.5 0 0.3" vertex-c="-0.5 0 0.3" color="#005599" position="0 0 1.25"></a-triangle>
 
       </a-entity>
       
     </a-marker>
 
-    <!-- Cámara principal -->
     <a-entity camera>
       <a-cursor raycaster="objects: [cursor-listener]" fuse="false"></a-cursor>
     </a-entity>
 
   </a-scene>
 
-  <!-- Control de animación al tocar -->
   <script>
     AFRAME.registerComponent('cursor-listener', {
       init: function () {
